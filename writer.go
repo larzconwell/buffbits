@@ -36,7 +36,7 @@ func (w *Writer) Err() error {
 	return w.err
 }
 
-// Write writes the lowest count bits of value to the buffer.
+// Write writes the lowest count bits of value to the Writer.
 func (w *Writer) Write(value uint64, count int) error {
 	if w.err != nil {
 		return w.err
@@ -60,7 +60,7 @@ func (w *Writer) Write(value uint64, count int) error {
 	w.buf = value & ((1 << (total - maxBits)) - 1)
 	w.count = total - maxBits
 
-	_, w.err = w.bw.Write(buffSplit(out, maxBits))
+	_, w.err = w.bw.Write(bufSplit(out, maxBits))
 	return w.err
 }
 
@@ -80,7 +80,7 @@ func (w *Writer) Flush() error {
 	}
 
 	if w.count > 0 {
-		_, w.err = w.bw.Write(buffSplit(w.buf, w.count))
+		_, w.err = w.bw.Write(bufSplit(w.buf, w.count))
 		if w.err != nil {
 			return w.err
 		}
@@ -93,8 +93,8 @@ func (w *Writer) Flush() error {
 	return w.err
 }
 
-// buffSplit splits the byte segments on the lower end of value up to count bits.
-func buffSplit(value uint64, count int) []byte {
+// bufSplit splits the byte segments on the lower end of value up to count bits.
+func bufSplit(value uint64, count int) []byte {
 	list := make([]byte, count/8)
 
 	for i := range list {
