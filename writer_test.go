@@ -19,6 +19,8 @@ func (ew ErrWriter) Write(b []byte) (int, error) {
 }
 
 func TestNewWriter(t *testing.T) {
+	t.Parallel()
+
 	writer := NewWriter(ioutil.Discard)
 
 	assert.Equal(t, writer.bw.Size(), writer.bw.Available())
@@ -28,6 +30,8 @@ func TestNewWriter(t *testing.T) {
 }
 
 func TestNewWriterSize(t *testing.T) {
+	t.Parallel()
+
 	size := 2048
 	writer := NewWriterSize(ioutil.Discard, size)
 
@@ -42,6 +46,8 @@ func TestWriterErr(t *testing.T) {
 	size := 7
 
 	t.Run("no error has occurred", func(t *testing.T) {
+		t.Parallel()
+
 		writer := NewWriterSize(ioutil.Discard, size)
 
 		writer.Write(0, (size+1)*8) // Write enough bits to trigger the buffer to flush
@@ -49,6 +55,8 @@ func TestWriterErr(t *testing.T) {
 	})
 
 	t.Run("error occurred during Write", func(t *testing.T) {
+		t.Parallel()
+
 		writer := NewWriterSize(ErrWriter{}, size)
 
 		writer.Write(0, (size+1)*8) // Write enough bits to trigger the buffer to flush
@@ -56,6 +64,8 @@ func TestWriterErr(t *testing.T) {
 	})
 
 	t.Run("error occurred during Flush", func(t *testing.T) {
+		t.Parallel()
+
 		writer := NewWriterSize(ErrWriter{}, size)
 
 		writer.Write(0, 8) // Write enough to allow a flush
@@ -68,6 +78,8 @@ func TestWriterErr(t *testing.T) {
 
 func TestWriterWrite(t *testing.T) {
 	t.Run("writer has errored previously", func(t *testing.T) {
+		t.Parallel()
+
 		writer := NewWriter(ioutil.Discard)
 		writer.err = io.ErrUnexpectedEOF
 
@@ -76,6 +88,8 @@ func TestWriterWrite(t *testing.T) {
 	})
 
 	t.Run("bits that have unclean bit positions set", func(t *testing.T) {
+		t.Parallel()
+
 		writer := NewWriter(ioutil.Discard)
 
 		writer.Write(0b10010, 4)
@@ -87,6 +101,8 @@ func TestWriterWrite(t *testing.T) {
 	})
 
 	t.Run("bits within bit buffer limit", func(t *testing.T) {
+		t.Parallel()
+
 		writer := NewWriter(ioutil.Discard)
 
 		writer.Write(0b101, 3)
@@ -100,6 +116,8 @@ func TestWriterWrite(t *testing.T) {
 	})
 
 	t.Run("bits that reach the bit buffer limit", func(t *testing.T) {
+		t.Parallel()
+
 		var out bytes.Buffer
 		writer := NewWriter(&out)
 
@@ -129,6 +147,8 @@ func TestWriterWrite(t *testing.T) {
 	})
 
 	t.Run("bits that exceed the bit buffer limit", func(t *testing.T) {
+		t.Parallel()
+
 		var out bytes.Buffer
 		writer := NewWriter(&out)
 
@@ -158,6 +178,8 @@ func TestWriterWrite(t *testing.T) {
 
 func TestWriterFlush(t *testing.T) {
 	t.Run("writer has errored previously", func(t *testing.T) {
+		t.Parallel()
+
 		writer := NewWriter(ioutil.Discard)
 		writer.err = io.ErrUnexpectedEOF
 
@@ -166,6 +188,8 @@ func TestWriterFlush(t *testing.T) {
 	})
 
 	t.Run("with no data in bit buffer", func(t *testing.T) {
+		t.Parallel()
+
 		var out bytes.Buffer
 		writer := NewWriter(&out)
 
@@ -178,6 +202,8 @@ func TestWriterFlush(t *testing.T) {
 	})
 
 	t.Run("with byte aligned data in bit buffer", func(t *testing.T) {
+		t.Parallel()
+
 		var out bytes.Buffer
 		writer := NewWriter(&out)
 
@@ -195,6 +221,8 @@ func TestWriterFlush(t *testing.T) {
 	})
 
 	t.Run("with byte misaligned data in bit buffer", func(t *testing.T) {
+		t.Parallel()
+
 		var out bytes.Buffer
 		writer := NewWriter(&out)
 
@@ -213,6 +241,8 @@ func TestWriterFlush(t *testing.T) {
 }
 
 func TestFuzzWriter(t *testing.T) {
+	t.Parallel()
+
 	seed := time.Now().UnixNano()
 	source := rand.NewSource(seed)
 	rng := rand.New(source)
