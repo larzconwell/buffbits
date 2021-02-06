@@ -12,12 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type ErrWriter struct{}
-
-func (ew ErrWriter) Write(b []byte) (int, error) {
-	return len(b), io.ErrUnexpectedEOF
-}
-
 func TestNewWriter(t *testing.T) {
 	t.Parallel()
 
@@ -57,22 +51,22 @@ func TestWriterErr(t *testing.T) {
 	t.Run("error occurred during Write", func(t *testing.T) {
 		t.Parallel()
 
-		writer := NewWriterSize(ErrWriter{}, size)
+		writer := NewWriterSize(errReadWriter{err: io.ErrNoProgress}, size)
 
 		writer.Write(0, (size+1)*8) // Write enough bits to trigger the buffer to flush
-		assert.ErrorIs(t, io.ErrUnexpectedEOF, writer.Err())
+		assert.ErrorIs(t, io.ErrNoProgress, writer.Err())
 	})
 
 	t.Run("error occurred during Flush", func(t *testing.T) {
 		t.Parallel()
 
-		writer := NewWriterSize(ErrWriter{}, size)
+		writer := NewWriterSize(errReadWriter{err: io.ErrNoProgress}, size)
 
 		writer.Write(0, 8) // Write enough to allow a flush
 		assert.NoError(t, writer.Err())
 
 		writer.Flush()
-		assert.ErrorIs(t, io.ErrUnexpectedEOF, writer.Err())
+		assert.ErrorIs(t, io.ErrNoProgress, writer.Err())
 	})
 }
 
@@ -81,10 +75,10 @@ func TestWriterWrite(t *testing.T) {
 		t.Parallel()
 
 		writer := NewWriter(ioutil.Discard)
-		writer.err = io.ErrUnexpectedEOF
+		writer.err = io.ErrNoProgress
 
 		err := writer.Write(0, 0)
-		assert.ErrorIs(t, io.ErrUnexpectedEOF, err)
+		assert.ErrorIs(t, io.ErrNoProgress, err)
 	})
 
 	t.Run("bits that have unclean bit positions set", func(t *testing.T) {
@@ -181,10 +175,10 @@ func TestWriterFlush(t *testing.T) {
 		t.Parallel()
 
 		writer := NewWriter(ioutil.Discard)
-		writer.err = io.ErrUnexpectedEOF
+		writer.err = io.ErrNoProgress
 
 		err := writer.Flush()
-		assert.ErrorIs(t, io.ErrUnexpectedEOF, err)
+		assert.ErrorIs(t, io.ErrNoProgress, err)
 	})
 
 	t.Run("with no data in bit buffer", func(t *testing.T) {
