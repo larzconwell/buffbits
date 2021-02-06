@@ -79,6 +79,24 @@ func TestReaderRead(t *testing.T) {
 		assert.ErrorIs(t, err, io.ErrNoProgress)
 	})
 
+	t.Run("read of more than max bits", func(t *testing.T) {
+		t.Parallel()
+
+		reader := NewReader(strings.NewReader(""))
+
+		_, err := reader.Read(65)
+		assert.ErrorIs(t, err, ErrInvalidCount)
+	})
+
+	t.Run("read of less than 0 bits", func(t *testing.T) {
+		t.Parallel()
+
+		reader := NewReader(strings.NewReader(""))
+
+		_, err := reader.Read(-1)
+		assert.ErrorIs(t, err, ErrInvalidCount)
+	})
+
 	t.Run("underlying reader returns an error", func(t *testing.T) {
 		t.Parallel()
 

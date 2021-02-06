@@ -42,8 +42,11 @@ func (r *Reader) Reset(reader io.Reader) {
 
 // Read reads count bits from the Reader and returns them in the lower positions of
 // the returned 64bit integer. If count bits cannot be read then io.ErrUnexpectedEOF
-// is returned.
+// is returned. count must not exceed 64 and must be at least 0.
 func (r *Reader) Read(count int) (uint64, error) {
+	if count < 0 || count > maxBits {
+		r.err = ErrInvalidCount
+	}
 	if r.err != nil {
 		return 0, r.err
 	}

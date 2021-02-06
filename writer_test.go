@@ -99,6 +99,24 @@ func TestWriterWrite(t *testing.T) {
 		assert.ErrorIs(t, err, io.ErrNoProgress)
 	})
 
+	t.Run("write with more than max bits", func(t *testing.T) {
+		t.Parallel()
+
+		writer := NewWriter(ioutil.Discard)
+
+		err := writer.Write(0, 65)
+		assert.ErrorIs(t, err, ErrInvalidCount)
+	})
+
+	t.Run("write with less than 0 bits", func(t *testing.T) {
+		t.Parallel()
+
+		writer := NewWriter(ioutil.Discard)
+
+		err := writer.Write(0, -1)
+		assert.ErrorIs(t, err, ErrInvalidCount)
+	})
+
 	t.Run("bits that have unclean bit positions set", func(t *testing.T) {
 		t.Parallel()
 

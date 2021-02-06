@@ -5,10 +5,6 @@ import (
 	"io"
 )
 
-const (
-	maxBits = 64
-)
-
 // Writer implements buffered bit level write access to an underlying io.Writer.
 // Buffered writing is powered by the bufio package. If an error occurs while writing
 // to a Writer, no more data will be written and all subsequent calls will return an
@@ -45,7 +41,11 @@ func (w *Writer) Reset(writer io.Writer) {
 }
 
 // Write writes the lowest count bits of value to the Writer.
+// count must not exceed 64 and must be at least 0.
 func (w *Writer) Write(value uint64, count int) error {
+	if count < 0 || count > maxBits {
+		w.err = ErrInvalidCount
+	}
 	if w.err != nil {
 		return w.err
 	}
