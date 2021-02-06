@@ -2,6 +2,7 @@ package buffbits
 
 import (
 	"bufio"
+	"errors"
 	"io"
 )
 
@@ -56,7 +57,7 @@ func (r *Reader) Read(count int) (uint64, error) {
 
 	data := make([]byte, 8)
 	n, err := r.br.Read(data)
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		err = io.ErrUnexpectedEOF
 	}
 	if err != nil {
