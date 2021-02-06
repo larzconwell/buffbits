@@ -70,6 +70,24 @@ func TestWriterErr(t *testing.T) {
 	})
 }
 
+func TestWriterReset(t *testing.T) {
+	writer := NewWriter(ioutil.Discard)
+	writer.Write(0, 64)
+	writer.Write(0, 16)
+	assert.NoError(t, writer.Err())
+	writer.err = io.ErrNoProgress
+
+	var out bytes.Buffer
+	writer.Reset(&out)
+
+	writer.Write(0, 64)
+	writer.Write(0, 16)
+	writer.Flush()
+	assert.NoError(t, writer.Err())
+
+	assert.Equal(t, make([]byte, 10), out.Bytes())
+}
+
 func TestWriterWrite(t *testing.T) {
 	t.Run("writer has errored previously", func(t *testing.T) {
 		t.Parallel()

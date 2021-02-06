@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] - 2020-00-00
 ## Added
-- Initial buffered bit reader implementation
+- Initial buffered bit `Reader` implementation.
+- Add `Reset` method to `Writer` to complement `Reader.Reset`.
 
 ## [0.1.0] - 2020-02-05
 ### Added
-- Initial buffered bit writer implementation
+- Initial buffered bit `Writer` implementation.

@@ -32,6 +32,14 @@ func (r *Reader) Err() error {
 	return r.err
 }
 
+// Reset discards any state and switches reading from the provided reader.
+func (r *Reader) Reset(reader io.Reader) {
+	r.br.Reset(reader)
+	r.buf = 0
+	r.count = 0
+	r.err = nil
+}
+
 // Read reads count bits from the Reader and returns them in the lower positions of
 // the returned 64bit integer. If count bits cannot be read then io.ErrUnexpectedEOF
 // is returned.

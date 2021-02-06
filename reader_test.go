@@ -55,6 +55,19 @@ func TestReaderErr(t *testing.T) {
 	})
 }
 
+func TestReaderReset(t *testing.T) {
+	reader := NewReader(bytes.NewReader([]byte{255, 255, 255}))
+	reader.Read(16)
+	assert.NoError(t, reader.Err())
+	reader.err = io.ErrNoProgress
+
+	reader.Reset(bytes.NewReader([]byte{0b10001000, 0b10101010, 0b11111111}))
+
+	value, _ := reader.Read(24)
+	assert.Equal(t, uint64(0b100010001010101011111111), value)
+	assert.NoError(t, reader.Err())
+}
+
 func TestReaderRead(t *testing.T) {
 	t.Run("reader has errored previously", func(t *testing.T) {
 		t.Parallel()

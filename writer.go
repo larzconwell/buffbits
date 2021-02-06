@@ -36,6 +36,14 @@ func (w *Writer) Err() error {
 	return w.err
 }
 
+// Reset discards any state and switches writing to the provided writer.
+func (w *Writer) Reset(writer io.Writer) {
+	w.bw.Reset(writer)
+	w.buf = 0
+	w.count = 0
+	w.err = nil
+}
+
 // Write writes the lowest count bits of value to the Writer.
 func (w *Writer) Write(value uint64, count int) error {
 	if w.err != nil {
