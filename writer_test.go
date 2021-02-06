@@ -54,7 +54,7 @@ func TestWriterErr(t *testing.T) {
 		writer := NewWriterSize(errReadWriter{err: io.ErrNoProgress}, size)
 
 		writer.Write(0, (size+1)*8) // Write enough bits to trigger the buffer to flush
-		assert.ErrorIs(t, io.ErrNoProgress, writer.Err())
+		assert.ErrorIs(t, writer.Err(), io.ErrNoProgress)
 	})
 
 	t.Run("error occurred during Flush", func(t *testing.T) {
@@ -66,7 +66,7 @@ func TestWriterErr(t *testing.T) {
 		assert.NoError(t, writer.Err())
 
 		writer.Flush()
-		assert.ErrorIs(t, io.ErrNoProgress, writer.Err())
+		assert.ErrorIs(t, writer.Err(), io.ErrNoProgress)
 	})
 }
 
@@ -78,7 +78,7 @@ func TestWriterWrite(t *testing.T) {
 		writer.err = io.ErrNoProgress
 
 		err := writer.Write(0, 0)
-		assert.ErrorIs(t, io.ErrNoProgress, err)
+		assert.ErrorIs(t, err, io.ErrNoProgress)
 	})
 
 	t.Run("bits that have unclean bit positions set", func(t *testing.T) {

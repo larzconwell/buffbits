@@ -51,7 +51,7 @@ func TestReaderErr(t *testing.T) {
 		reader := NewReader(errReadWriter{err: io.ErrNoProgress})
 
 		reader.Read(8)
-		assert.ErrorIs(t, io.ErrNoProgress, reader.Err())
+		assert.ErrorIs(t, reader.Err(), io.ErrNoProgress)
 	})
 }
 
@@ -63,7 +63,7 @@ func TestReaderRead(t *testing.T) {
 		reader.err = io.ErrNoProgress
 
 		_, err := reader.Read(1)
-		assert.ErrorIs(t, io.ErrNoProgress, err)
+		assert.ErrorIs(t, err, io.ErrNoProgress)
 	})
 
 	t.Run("underlying reader returns an error", func(t *testing.T) {
@@ -72,7 +72,7 @@ func TestReaderRead(t *testing.T) {
 		reader := NewReader(errReadWriter{err: io.ErrNoProgress})
 
 		_, err := reader.Read(1)
-		assert.ErrorIs(t, io.ErrNoProgress, err)
+		assert.ErrorIs(t, err, io.ErrNoProgress)
 	})
 
 	t.Run("more bits than are available in the underlying reader", func(t *testing.T) {
@@ -81,7 +81,7 @@ func TestReaderRead(t *testing.T) {
 		reader := NewReader(bytes.NewReader([]byte{0}))
 
 		_, err := reader.Read(9)
-		assert.ErrorIs(t, io.ErrUnexpectedEOF, err)
+		assert.ErrorIs(t, err, io.ErrUnexpectedEOF)
 	})
 
 	t.Run("underlying reader reached EOF when reading bits", func(t *testing.T) {
@@ -93,7 +93,7 @@ func TestReaderRead(t *testing.T) {
 		assert.NoError(t, err)
 
 		_, err = reader.Read(1)
-		assert.ErrorIs(t, io.ErrUnexpectedEOF, err)
+		assert.ErrorIs(t, err, io.ErrUnexpectedEOF)
 	})
 
 	t.Run("bits within the bit buffer limit", func(t *testing.T) {
@@ -167,8 +167,8 @@ func TestFuzzReader(t *testing.T) {
 	reader := NewReader(bytes.NewReader(data))
 
 	// Read the data stream in intervals of random bit counts.
-	var out bytes.Buffer
-	writer := NewWriter(&out)
+	var actual bytes.Buffer
+	writer := NewWriter(&actual)
 	left := len(data) * 8
 	for left != 0 {
 		maxBits := 64
@@ -188,7 +188,7 @@ func TestFuzzReader(t *testing.T) {
 	writer.Flush()
 	assert.NoError(t, writer.Err())
 
-	if !assert.Equal(t, data, out.Bytes()) {
+	if !assert.Equal(t, data, actual.Bytes()) {
 		t.Logf("retry with seed = %#v", seed)
 	}
 }
