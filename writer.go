@@ -94,6 +94,7 @@ func (w *Writer) Flush() error {
 }
 
 // bufSplit splits the byte segments on the lower end of value up to count bits.
+// count must be byte aligned and must not be more than 64.
 func bufSplit(value uint64, count int) []byte {
 	list := make([]byte, count/8)
 
