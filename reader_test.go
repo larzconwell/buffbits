@@ -3,12 +3,9 @@ package buffbits
 import (
 	"bytes"
 	"io"
-	"math/rand"
 	"strings"
 	"testing"
-	"time"
 
-	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -182,44 +179,4 @@ func TestReaderRead(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, uint64(0b0000011100001111000111110011111101111111111111110000000100000011), value)
 	})
-}
-
-func TestFuzzReader(t *testing.T) {
-	t.Parallel()
-
-	seed := time.Now().UnixNano()
-	source := rand.NewSource(seed)
-	rng := rand.New(source)
-	fuzzer := fuzz.New().RandSource(source).NilChance(0).NumElements(1, 4096)
-
-	var data []byte
-	fuzzer.Fuzz(&data)
-
-	reader := NewReader(bytes.NewReader(data))
-
-	// Read the data stream in intervals of random bit counts.
-	var actual bytes.Buffer
-	writer := NewWriter(&actual)
-	left := len(data) * 8
-	for left != 0 {
-		maxBits := 64
-		if left < maxBits {
-			maxBits = left
-		}
-
-		bitsCount := rng.Intn(maxBits) + 1
-		left -= bitsCount
-
-		value, err := reader.Read(bitsCount)
-		assert.NoError(t, err)
-
-		writer.Write(value, bitsCount)
-	}
-
-	writer.Flush()
-	assert.NoError(t, writer.Err())
-
-	if !assert.Equal(t, data, actual.Bytes()) {
-		t.Logf("retry with seed = %#v", seed)
-	}
 }
